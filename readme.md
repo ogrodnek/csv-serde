@@ -7,4 +7,4 @@
           stored as textfile
         ;
 
-see: ...
+see: http://dev.bizo.com/2010/11/csv-and-hive.html
