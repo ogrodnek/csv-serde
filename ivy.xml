@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+
+  <info organisation="bizo.com" module="csv-serde" />
+
+  <configurations>
+    <conf name="default" description="core dependencies needed at compile-time and runtime"/>
+    <conf name="buildtime" visibility="private" description="additional dependencies needed only at build time"/>
+    <conf name="test" visibility="private" description="additional dependencies needed only for testing"/>
+    <conf name="sources" description="source artifacts"/>
+    <conf name="hadoop" visibility="private"/>    
+  </configurations>
+
+  <publications>
+    <artifact conf="default"/>
+    <artifact name="${ivy.module}-src" type="source" ext="zip" conf="sources"/>
+  </publications>
+
+  <dependencies defaultconf="default->default;hadoop->default;sources->sources()">
+    <!-- default (compile, test, runtime) dependencies -->
+    <dependency org="opencsv" name="opencsv" rev="2.2" />
+    
+    <dependency org="apache" name="hive" rev="0.5.0" conf="default->exec" />
+      
+    <dependency org="apache" name="hadoop" rev="0.20.0" conf="buildtime->default">
+      <artifact name="hadoop-core" type="jar" />
+    </dependency>    
+    
+    <!-- build time only dependencies -->
+    <dependency org="findbugs" name="findbugs" rev="1.3.9" conf="buildtime->default"/>
+    <dependency org="checkstyle" name="checkstyle" rev="all-5.1" conf="buildtime->default"/>
+    <dependency org="svntask" name="svntask" rev="1.0.7" conf="buildtime->default"/>
+    <dependency org="cobertura" name="cobertura" rev="1.9.4.1" conf="buildtime->default"/>
+
+    <!-- test time only dependencies -->
+    <dependency org="junit" name="junit" rev="4.8.2" conf="test->default"/>
+  </dependencies>
+</ivy-module>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="target/classes" path="src/main/java"/>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/default/hadoop-core.jar"/>
+	<classpathentry kind="lib" path="lib/default/hive-exec.jar"/>
+	<classpathentry kind="lib" path="lib/default/opencsv.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>

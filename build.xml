@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<project name="csv-serde" default="dist">
+
+  <!-- you may override default properties for the build by using entries
+       in a build.properties file, or by just adding 'property' elements
+	   here, before the following properties files are loaded -->
+  <property file="build.properties"/>
+  <property file="project.properties"/>
+  <property file="${common.build.dir}/build.properties"/>
+  <property file="${common.build.dir}/project.properties"/>
+  <property file="${user.home}/build.properties"/>
+
+  <import file="${common.build.dir}/common-targets.xml"/>
+  <import file="${common.build.dir}/repository-targets.xml"/>
+  <import file="${common.build.dir}/cobertura-targets.xml"/>
+  <import file="${common.build.dir}/findbugs-targets.xml"/>
+  <import file="${common.build.dir}/checkstyle-targets.xml"/>
+  <import file="${common.build.dir}/hadoop-targets.xml"/>
+  
+  <target name="jar.pre" depends="hadoop.unjar.dependencies" />
+
+  <!-- Hudson target -->
+  <target name="hudson" depends="reallyclean, dist, findbugs, checkstyle, cobertura-xml-report, commit.repo"/>
+  
+</project>
