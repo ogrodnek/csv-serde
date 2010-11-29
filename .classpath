@@ -6,5 +6,8 @@
 	<classpathentry kind="lib" path="lib/default/hadoop-core.jar"/>
 	<classpathentry kind="lib" path="lib/default/hive-exec.jar"/>
 	<classpathentry kind="lib" path="lib/default/opencsv.jar"/>
+	<classpathentry kind="lib" path="lib/test/junit.jar"/>
+	<classpathentry kind="lib" path="lib/buildtime/log4j.jar"/>
+	<classpathentry kind="lib" path="lib/test/commons-logging.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -35,9 +35,9 @@ import au.com.bytecode.opencsv.CSVWriter;
 public final class CSVSerde implements SerDe {
   
   private ObjectInspector inspector;
-  String[] outputFields;
-  int numCols;
-  List<String> row;
+  private String[] outputFields;
+  private int numCols;
+  private List<String> row;
   
   @Override
   public void initialize(final Configuration conf, final Properties tbl) throws SerDeException {
@@ -102,8 +102,9 @@ public final class CSVSerde implements SerDe {
   public Object deserialize(final Writable blob) throws SerDeException {
     Text rowText = (Text) blob;
     
+    CSVReader csv = null;
     try {
-      final CSVReader csv = new CSVReader(new CharArrayReader(rowText.toString().toCharArray()));
+      csv = new CSVReader(new CharArrayReader(rowText.toString().toCharArray()));
       final String[] read = csv.readNext();
       
       for (int i=0; i< numCols; i++) {
@@ -117,6 +118,14 @@ public final class CSVSerde implements SerDe {
       return row;
     } catch (final Exception e) {
       throw new SerDeException(e);
+    } finally {
+      if (csv != null) {
+        try {
+          csv.close();
+        } catch (final Exception e) {
+          // ignore
+        }
+      }
     }
   }
 

@@ -34,6 +34,7 @@
     <dependency org="cobertura" name="cobertura" rev="1.9.4.1" conf="buildtime->default"/>
 
     <!-- test time only dependencies -->
+    <dependency org="apache" name="commons-logging" rev="1.1.1" conf="test->default" />    
     <dependency org="junit" name="junit" rev="4.8.2" conf="test->default"/>
   </dependencies>
 </ivy-module>
