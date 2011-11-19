@@ -1,88 +1,91 @@
+
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset='utf-8'>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>csv-serde : hive csv support</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-  <title>ogrodnek/csv-serde @ GitHub</title>
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-  <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #71dc27;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #ffffff;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #8e23d8; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #8e23d8; }
-    h3 { text-align: center; color: #8e23d8; }
-    a { color: #8e23d8; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
-</head>
+    <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+    </style>
+    <script type="text/javascript" src="http://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
+    <link rel="stylesheet" href="css/prettify.css">
+  </head>
 
-<body>
-  <a href="https://github.com/ogrodnek/csv-serde"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+  <body onload="prettyPrint();">
 
-  <div id="container">
-
-    <div class="download">
-      <a href="https://github.com/ogrodnek/csv-serde/zipball/master">
-        <img border="0" width="90" src="https://github.com/images/modules/download/zip.png"></a>
-      <a href="https://github.com/ogrodnek/csv-serde/tarball/master">
-        <img border="0" width="90" src="https://github.com/images/modules/download/tar.png"></a>
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="#">csv-serde</a>
+          <ul class="nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="https://github.com/ogrodnek/csv-serde">Source</a></li>
+            <li><a href="https://github.com/ogrodnek/csv-serde/downloads">Downloads</a></li>
+            <li><a href="https://github.com/ogrodnek/csv-serde/issues">Report Issue</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
 
-    <h1><a href="https://github.com/ogrodnek/csv-serde">csv-serde</a>
-      <span class="small">by <a href="https://github.com/ogrodnek">ogrodnek</a></span></h1>
+    <div class="container">
 
-    <div class="description">
-      Hive SerDe for CSV
-    </div>
+      <!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="hero-unit">
+        <h1>csv-serde</h1>
+        <h2>Hive CSV Support</h2>
+        <p>csv-serde adds real CSV support to <a href="http://hive.apache.org/">hive</a> using <a href="http://opencsv.sourceforge.net/">opencsv</a>.</p>
+        <p>
+	    </p>
+      </div>
 
-    
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="span7">
+          <h2>Using it</h2>
+          <pre class="prettyprint">
+add jar path/to/csv-serde.jar;
 
-    
+create table my_table(a string, b string, ...)
+  row format serde 'com.bizo.hive.serde.csv.CSVSerde'
+  stored as textfile
+;	
+	      </pre>
+        </div>
+        <div class="span4">
+          <h2>Download</h2>
+          <p>
+          <ul>
+	        <li>
+		      <a href="https://github.com/downloads/ogrodnek/csv-serde/csv-serde-1.0.jar">csv-serde-1.0.jar</a>
+		    </li>
+            <li><a href="https://github.com/ogrodnek/csv-serde/zipball/master">csv-serde-src.zip</a></li>	
 
-    
+          </p>
+       </div>
+        <div class="span4">
+          <h2>License</h2>
+          <p>
+	        csv-serde is open source and licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache 2 License</a>.
+          </p>
+       </div>
+      </div>
 
-    
+      <footer>
+        <p>&copy; Company 2011</p>
+      </footer>
 
-    
-      <h2>Authors</h2>
-      <p>Larry Ogrodnek (ogrodnek@gmail.com)<br/>      </p>
-    
+    </div> <!-- /container -->
 
-    
-      <h2>Contact</h2>
-      <p>Larry Ogrodnek (ogrodnek@gmail.com)<br/>      </p>
-    
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="https://github.com/ogrodnek/csv-serde/zipball/master">zip</a> or
-      <a href="https://github.com/ogrodnek/csv-serde/tarball/master">tar formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/ogrodnek/csv-serde</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="https://github.com/ogrodnek/csv-serde">ogrodnek/csv-serde</a>
-    </div>
-
-  </div>
-
-</body>
+  </body>
 </html>
