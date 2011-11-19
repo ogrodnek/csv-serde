@@ -44,7 +44,8 @@
         <h1>csv-serde</h1>
         <h2>Hive CSV Support</h2>
         <p>csv-serde adds real CSV support to <a href="http://hive.apache.org/">hive</a> using <a href="http://opencsv.sourceforge.net/">opencsv</a>.</p>
-        <p>
+        <p>The CSV format is surprisingly tricky.  It's not as easy as splitting on commas.  You need to handle
+	commas in your data that are quoted, quoted quotes, etc.  This SerDe lets you easily read and write CSV files in hive.
 	    </p>
       </div>
 
