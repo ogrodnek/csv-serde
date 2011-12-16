@@ -46,36 +46,56 @@
         <p>csv-serde adds real CSV support to <a href="http://hive.apache.org/">hive</a> using <a href="http://opencsv.sourceforge.net/">opencsv</a>.</p>
       </div>
 
-      <!-- Example row of columns -->
       <div class="row">
-        <div class="span7">
+        <div class="span5">
+          <h2>Download</h2>
+          <p>
+          <ul>
+            <li>
+              <a href="https://github.com/downloads/ogrodnek/csv-serde/csv-serde-1.1.2.jar">csv-serde-1.1.2.jar</a>
+            </li>
+            <li><a href="https://github.com/ogrodnek/csv-serde/zipball/master">csv-serde-master-src.zip</a></li>	
+
+          </p>
+       </div>
+        <div class="span5">
+          <h2>License</h2>
+          <p>
+	    csv-serde is open source and licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache 2 License</a>.
+          </p>
+       </div>
+       </div>
+
+      <div class="row">
+        <div class="span10">
           <h2>Using it</h2>
           <pre class="prettyprint">
 add jar path/to/csv-serde.jar;
 
 create table my_table(a string, b string, ...)
-  row format serde 'com.bizo.hive.serde.csv.CSVSerde'
-  stored as textfile
+ row format serde 'com.bizo.hive.serde.csv.CSVSerde'
+ stored as textfile
 ;	
 	      </pre>
-        </div>
-        <div class="span4">
-          <h2>Download</h2>
-          <p>
-          <ul>
-	        <li>
-		      <a href="https://github.com/downloads/ogrodnek/csv-serde/csv-serde-1.0.jar">csv-serde-1.0.jar</a>
-		    </li>
-            <li><a href="https://github.com/ogrodnek/csv-serde/zipball/master">csv-serde-src.zip</a></li>	
 
-          </p>
-       </div>
-        <div class="span4">
-          <h2>License</h2>
-          <p>
-	        csv-serde is open source and licensed under the <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache 2 License</a>.
-          </p>
-       </div>
+	  <p>You can also specify custom separator, quote, or escape
+	  characters.</p>
+          <pre class="prettyprint">
+add jar path/to/csv-serde.jar;
+
+create table my_table(a string, b string, ...)
+ row format serde 'com.bizo.hive.serde.csv.CSVSerde'
+ with serdeproperties (
+   "separatorChar" = "\t",
+   "quoteChar"     = "'",
+   "escapeChar"    = "\\"
+  )	  
+ stored as textfile
+;	
+	      </pre>
+	  
+        </div>
+
       </div>
 
       <footer>
