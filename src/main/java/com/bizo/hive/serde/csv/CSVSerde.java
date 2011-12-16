@@ -2,7 +2,9 @@ package com.bizo.hive.serde.csv;
 
 import java.io.CharArrayReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,10 +41,14 @@ public final class CSVSerde implements SerDe {
   private int numCols;
   private List<String> row;
   
+  private char separatorChar;
+  private char quoteChar;
+  private char escapeChar;
+  
+    
   @Override
   public void initialize(final Configuration conf, final Properties tbl) throws SerDeException {
     final List<String> columnNames = Arrays.asList(tbl.getProperty(Constants.LIST_COLUMNS).split(","));
-    
     final List<TypeInfo> columnTypes = TypeInfoUtils.getTypeInfosFromTypeString(tbl.getProperty(Constants.LIST_COLUMN_TYPES));
     
     numCols = columnNames.size();
@@ -60,7 +66,21 @@ public final class CSVSerde implements SerDe {
     for (int i=0; i< numCols; i++) {
       row.add(null);
     }
-  }  
+    
+    separatorChar = getProperty(tbl, "separatorChar", CSVWriter.DEFAULT_SEPARATOR);
+    quoteChar = getProperty(tbl, "quoteChar", CSVWriter.DEFAULT_QUOTE_CHARACTER);
+    escapeChar = getProperty(tbl, "escapeChar", CSVWriter.DEFAULT_ESCAPE_CHARACTER);
+  }
+  
+  private final char getProperty(final Properties tbl, final String property, final char def) {
+    final String val = tbl.getProperty(property);
+    
+    if (val != null) {
+      return val.charAt(0);
+    }
+    
+    return def;
+  }
   
   @Override
   public Writable serialize(Object obj, ObjectInspector objInspector) throws SerDeException {
@@ -86,7 +106,7 @@ public final class CSVSerde implements SerDe {
     }
     
     final StringWriter writer = new StringWriter();
-    final CSVWriter csv = new CSVWriter(writer, CSVWriter.DEFAULT_SEPARATOR, CSVWriter.DEFAULT_QUOTE_CHARACTER, "");
+    final CSVWriter csv = newWriter(writer, separatorChar, quoteChar, escapeChar);
     
     try {
       csv.writeNext(outputFields);
@@ -104,7 +124,7 @@ public final class CSVSerde implements SerDe {
     
     CSVReader csv = null;
     try {
-      csv = new CSVReader(new CharArrayReader(rowText.toString().toCharArray()));
+      csv = newReader(new CharArrayReader(rowText.toString().toCharArray()), separatorChar, quoteChar, escapeChar);      
       final String[] read = csv.readNext();
       
       for (int i=0; i< numCols; i++) {
@@ -126,6 +146,24 @@ public final class CSVSerde implements SerDe {
           // ignore
         }
       }
+    }
+  }
+  
+  private CSVReader newReader(final Reader reader, char separator, char quote, char escape) {
+    // CSVReader will throw an exception if any of separator, quote, or escape is the same, but 
+    // the CSV format specifies that the escape character and quote char are the same... very weird
+    if (CSVWriter.DEFAULT_ESCAPE_CHARACTER == escape) {
+      return new CSVReader(reader, separator, quote);
+    } else {
+      return new CSVReader(reader, separator, quote, escape);      
+    }
+  }
+  
+  private CSVWriter newWriter(final Writer writer, char separator, char quote, char escape) {
+    if (CSVWriter.DEFAULT_ESCAPE_CHARACTER == escape) {
+      return new CSVWriter(writer, separator, quote, "");
+    } else {
+      return new CSVWriter(writer, separator, quote, escape, "");      
     }
   }
 

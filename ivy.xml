@@ -19,7 +19,7 @@
 
   <dependencies defaultconf="default->default;hadoop->default;sources->sources()">
     <!-- default (compile, test, runtime) dependencies -->
-    <dependency org="opencsv" name="opencsv" rev="2.2" />
+    <dependency org="opencsv" name="opencsv" rev="2.3" />
     
     <dependency org="apache" name="hive" rev="0.5.0" conf="default->exec" />
       
