@@ -21,9 +21,12 @@
     <!-- default (compile, test, runtime) dependencies -->
     <dependency org="opencsv" name="opencsv" rev="2.3" />
     
-    <dependency org="apache" name="hive" rev="0.5.0" conf="default->exec" />
+    <dependency org="apache" name="hive" rev="0.8.1" conf="buildtime->default">
+      <artifact name="hive-exec" type="jar" />
+    </dependency>
+
       
-    <dependency org="apache" name="hadoop" rev="0.20.0" conf="buildtime->default">
+    <dependency org="apache" name="hadoop" rev="0.20.2" conf="buildtime->default">
       <artifact name="hadoop-core" type="jar" />
     </dependency>    
     
