@@ -3,7 +3,7 @@ package com.bizo.hive.serde.csv;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.hadoop.hive.serde.Constants;
+import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.io.Text;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +16,8 @@ public final class CSVSerdeTest {
   
   @Before
   public void setup() throws Exception {
-    props.put(Constants.LIST_COLUMNS, "a,b,c");
-    props.put(Constants.LIST_COLUMN_TYPES, "string,string,string");
+    props.put(serdeConstants.LIST_COLUMNS, "a,b,c");
+    props.put(serdeConstants.LIST_COLUMN_TYPES, "string,string,string");
   }
   
   @Test
