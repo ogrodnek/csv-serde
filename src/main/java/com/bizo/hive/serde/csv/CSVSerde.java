@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.serde.Constants;
@@ -47,6 +49,7 @@ public final class CSVSerde implements SerDe {
   private char quoteChar;
   private char escapeChar;
   private String encoding;
+  private boolean normalize;
 
 
   @Override
@@ -74,8 +77,15 @@ public final class CSVSerde implements SerDe {
     quoteChar = getProperty(tbl, "quoteChar", CSVWriter.DEFAULT_QUOTE_CHARACTER);
     escapeChar = getProperty(tbl, "escapeChar", CSVWriter.DEFAULT_ESCAPE_CHARACTER);
 
-    encoding = tbl.getProperty("encoding");
-	if (encoding == null) encoding = "UTF8";
+    encoding = tbl.getProperty("encoding", "UTF8");
+
+    String _normalize = tbl.getProperty("normalize", "false");
+    if (_normalize != null && _normalize.equals("true")) {
+	normalize = true;
+    } else {
+	normalize = false;
+    }
+
   }
 
   private final char getProperty(final Properties tbl, final String property, final char def) {
@@ -118,7 +128,14 @@ public final class CSVSerde implements SerDe {
       csv.writeNext(outputFields);
       csv.close();
 
-      return new BytesWritable(writer.toString().getBytes(encoding));
+      String csvs = writer.toString();
+      if (normalize) {
+	  csvs = Normalizer.normalize(csvs, Form.NFKC);
+	  csvs = csvs.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+	      csvs = csvs.replaceAll("\\p{Cc}", "");
+      }
+
+      return new BytesWritable(csvs.getBytes(encoding));
     } catch (final IOException ioe) {
       throw new SerDeException(ioe);
     }
