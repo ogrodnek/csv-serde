@@ -132,7 +132,7 @@ public final class CSVSerde implements SerDe {
       if (normalize) {
 	  csvs = Normalizer.normalize(csvs, Form.NFKC);
 	  csvs = csvs.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-	      csvs = csvs.replaceAll("\\p{Cc}", "");
+	  csvs = csvs.replaceAll("\\p{C}", "");
       }
 
       return new BytesWritable(csvs.getBytes(encoding));
