@@ -81,9 +81,9 @@ public final class CSVSerde implements SerDe {
 
     String _normalize = tbl.getProperty("normalize", "false");
     if (_normalize != null && _normalize.equals("true")) {
-	normalize = true;
+    normalize = true;
     } else {
-	normalize = false;
+    normalize = false;
     }
 
   }
@@ -130,9 +130,10 @@ public final class CSVSerde implements SerDe {
 
       String csvs = writer.toString();
       if (normalize) {
-	  csvs = Normalizer.normalize(csvs, Form.NFKC);
-	  csvs = csvs.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-	  csvs = csvs.replaceAll("\\p{C}", "");
+      csvs = Normalizer.normalize(csvs, Form.NFKC);
+      csvs = csvs.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+      csvs = csvs.replaceAll("\\p{C}", "");
+      csvs = csvs.replaceAll("\"", "");
       }
 
       return new BytesWritable(csvs.getBytes(encoding));
