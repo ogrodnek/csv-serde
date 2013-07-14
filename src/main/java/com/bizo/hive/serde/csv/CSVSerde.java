@@ -50,6 +50,7 @@ public final class CSVSerde implements SerDe {
   private char escapeChar;
   private String encoding;
   private boolean normalize;
+  private boolean stripQuotes;
 
 
   @Override
@@ -86,6 +87,12 @@ public final class CSVSerde implements SerDe {
     normalize = false;
     }
 
+    String _stripQuote = tbl.getProperty("stripQuotes", "false");
+    if (_stripQuote != null && _stripQuote.equals("true")) {
+        stripQuotes = true;
+    } else {
+        stripQuotes = false;
+    }
   }
 
   private final char getProperty(final Properties tbl, final String property, final char def) {
@@ -118,7 +125,10 @@ public final class CSVSerde implements SerDe {
 
       // Convert the field to Java class String, because objects of String type
       // can be stored in String, Text, or some other classes.
-      outputFields[c] = fieldStringOI.getPrimitiveJavaObject(field).replaceAll("\"", "");
+      outputFields[c] = fieldStringOI.getPrimitiveJavaObject(field);
+      if(stripQuotes) {
+          outputFields[c] = outputFields[c].replaceAll("\"", "");
+      }
     }
 
     final StringWriter writer = new StringWriter();
