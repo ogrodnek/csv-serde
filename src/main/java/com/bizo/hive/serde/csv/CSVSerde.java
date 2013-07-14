@@ -118,7 +118,7 @@ public final class CSVSerde implements SerDe {
 
       // Convert the field to Java class String, because objects of String type
       // can be stored in String, Text, or some other classes.
-      outputFields[c] = fieldStringOI.getPrimitiveJavaObject(field);
+      outputFields[c] = fieldStringOI.getPrimitiveJavaObject(field).replaceAll("\"", "");
     }
 
     final StringWriter writer = new StringWriter();
@@ -133,7 +133,6 @@ public final class CSVSerde implements SerDe {
       csvs = Normalizer.normalize(csvs, Form.NFKC);
       csvs = csvs.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
       csvs = csvs.replaceAll("\\p{C}", "");
-      csvs = csvs.replaceAll("\"", "");
       }
 
       return new BytesWritable(csvs.getBytes(encoding));
