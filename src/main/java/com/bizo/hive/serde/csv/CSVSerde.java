@@ -50,6 +50,7 @@ public final class CSVSerde implements SerDe {
   private char escapeChar;
   private String encoding;
   private boolean normalize;
+  private boolean stripQuotes;
 
 
   @Override
@@ -79,13 +80,21 @@ public final class CSVSerde implements SerDe {
 
     encoding = tbl.getProperty("encoding", "UTF8");
 
-    String _normalize = tbl.getProperty("normalize", "false");
-    if (_normalize != null && _normalize.equals("true")) {
-	normalize = true;
+    String _normalize = tbl.getProperty("normalize", "false").toLowerCase();
+    if (_normalize != null && (_normalize.equals("true") ||
+          _normalize.equals("yes"))) {
+      normalize = true;
     } else {
-	normalize = false;
+      normalize = false;
     }
 
+    String _stripQuote = tbl.getProperty("stripQuotes", "false").toLowerCase();
+    if (_stripQuote != null && (_stripQuote.equals("true") ||
+          _stripQuote.equals("yes"))) {
+      stripQuotes = true;
+    } else {
+      stripQuotes = false;
+    }
   }
 
   private final char getProperty(final Properties tbl, final String property, final char def) {
@@ -119,6 +128,9 @@ public final class CSVSerde implements SerDe {
       // Convert the field to Java class String, because objects of String type
       // can be stored in String, Text, or some other classes.
       outputFields[c] = fieldStringOI.getPrimitiveJavaObject(field);
+      if (stripQuotes) {
+          outputFields[c] = outputFields[c].replaceAll(String.valueOf(quoteChar), "");
+      }
     }
 
     final StringWriter writer = new StringWriter();
@@ -130,9 +142,9 @@ public final class CSVSerde implements SerDe {
 
       String csvs = writer.toString();
       if (normalize) {
-	  csvs = Normalizer.normalize(csvs, Form.NFKC);
-	  csvs = csvs.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-	  csvs = csvs.replaceAll("\\p{C}", "");
+      csvs = Normalizer.normalize(csvs, Form.NFKC);
+      csvs = csvs.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+      csvs = csvs.replaceAll("\\p{C}", "");
       }
 
       return new BytesWritable(csvs.getBytes(encoding));
