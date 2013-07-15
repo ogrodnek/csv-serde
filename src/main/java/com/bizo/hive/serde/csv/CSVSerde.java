@@ -53,10 +53,8 @@ public final class CSVSerde implements SerDe {
   private boolean normalize;
   private boolean stripQuotes;
 
-  private final static Logger LOGGER = Logger.getLogger(CSVSerde.class.getName());
 
-
-    @Override
+  @Override
   public void initialize(final Configuration conf, final Properties tbl) throws SerDeException {
     final List<String> columnNames = Arrays.asList(tbl.getProperty(Constants.LIST_COLUMNS).split(","));
     final List<TypeInfo> columnTypes = TypeInfoUtils.getTypeInfosFromTypeString(tbl.getProperty(Constants.LIST_COLUMN_TYPES));
@@ -87,20 +85,16 @@ public final class CSVSerde implements SerDe {
     if (_normalize != null && (_normalize.equals("true") ||
           _normalize.equals("yes"))) {
       normalize = true;
-      LOGGER.info("normalized input set to true");
     } else {
       normalize = false;
-      LOGGER.info("normalized input set to false");
     }
 
     String _stripQuote = tbl.getProperty("stripQuotes", "false").toLowerCase();
     if (_stripQuote != null && (_stripQuote.equals("true") ||
           _stripQuote.equals("yes"))) {
       stripQuotes = true;
-      LOGGER.info("stripping quotes set to true!");
     } else {
       stripQuotes = false;
-      LOGGER.info("stripping quotes set to false!");
     }
   }
 
@@ -135,9 +129,9 @@ public final class CSVSerde implements SerDe {
       // Convert the field to Java class String, because objects of String type
       // can be stored in String, Text, or some other classes.
       outputFields[c] = fieldStringOI.getPrimitiveJavaObject(field);
+
       if (stripQuotes) {
-          outputFields[c] = outputFields[c].replaceAll(String.valueOf(quoteChar), "");
-          LOGGER.info("quotes are striped!");
+        outputFields[c] = outputFields[c].replaceAll(String.valueOf(quoteChar), "");
       }
     }
 
@@ -150,10 +144,9 @@ public final class CSVSerde implements SerDe {
 
       String csvs = writer.toString();
       if (normalize) {
-      csvs = Normalizer.normalize(csvs, Form.NFKC);
-      csvs = csvs.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-      csvs = csvs.replaceAll("\\p{C}", "");
-      LOGGER.info("string is normalized!");
+        csvs = Normalizer.normalize(csvs, Form.NFKC);
+        csvs = csvs.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        csvs = csvs.replaceAll("\\p{C}", "");
       }
 
       return new BytesWritable(csvs.getBytes(encoding));
