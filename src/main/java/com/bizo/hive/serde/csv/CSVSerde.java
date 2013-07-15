@@ -80,18 +80,20 @@ public final class CSVSerde implements SerDe {
 
     encoding = tbl.getProperty("encoding", "UTF8");
 
-    String _normalize = tbl.getProperty("normalize", "false");
-    if (_normalize != null && _normalize.equals("true")) {
-    normalize = true;
+    String _normalize = tbl.getProperty("normalize", "false").toLowerCase();
+    if (_normalize != null && (_normalize.equals("true") ||
+          _normalize.equals("yes"))) {
+      normalize = true;
     } else {
-    normalize = false;
+      normalize = false;
     }
 
-    String _stripQuote = tbl.getProperty("stripQuotes", "false");
-    if (_stripQuote != null && _stripQuote.equals("true")) {
-        stripQuotes = true;
+    String _stripQuote = tbl.getProperty("stripQuotes", "false").toLowerCase();
+    if (_stripQuote != null && (_stripQuote.equals("true") ||
+          _stripQuote.equals("yes"))) {
+      stripQuotes = true;
     } else {
-        stripQuotes = false;
+      stripQuotes = false;
     }
   }
 
@@ -126,8 +128,8 @@ public final class CSVSerde implements SerDe {
       // Convert the field to Java class String, because objects of String type
       // can be stored in String, Text, or some other classes.
       outputFields[c] = fieldStringOI.getPrimitiveJavaObject(field);
-      if(stripQuotes) {
-          outputFields[c] = outputFields[c].replaceAll("\"", "");
+      if (stripQuotes) {
+          outputFields[c] = outputFields[c].replaceAll(String.valueOf(quoteChar), "");
       }
     }
 
