@@ -155,7 +155,7 @@ public class CSVSerde implements SerDe {
       csv.writeNext(outputFields);
       csv.close();
 
-      return new BytesWritable(writer.toString().getBytes(encoding));
+      return new BytesWritable(writer.toString().replaceAll("\"NULL\"", "NULL").getBytes(encoding));
     } catch (final IOException ioe) {
       throw new SerDeException(ioe);
     }
