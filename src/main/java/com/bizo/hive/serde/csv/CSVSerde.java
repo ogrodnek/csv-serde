@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.logging.Logger;
+import java.lang.Boolean;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.serde.Constants;
@@ -24,6 +25,10 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.BooleanObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.BytesWritable;
@@ -39,20 +44,20 @@ import au.com.bytecode.opencsv.CSVWriter;
  *
  * @author Larry Ogrodnek <ogrodnek@gmail.com>
  */
-public final class CSVSerde implements SerDe {
+public class CSVSerde implements SerDe {
 
-  private ObjectInspector inspector;
-  private String[] outputFields;
-  private int numCols;
-  private List<String> row;
+  ObjectInspector inspector;
+  String[] outputFields;
+  int numCols;
+  List<String> row;
+  boolean[] isBoolCol;
 
-  private char separatorChar;
-  private char quoteChar;
-  private char escapeChar;
-  private String encoding;
-  private boolean normalize;
-  private boolean stripQuotes;
-
+  char separatorChar;
+  char quoteChar;
+  char escapeChar;
+  String encoding;
+  boolean normalize;
+  boolean stripQuotes;
 
   @Override
   public void initialize(final Configuration conf, final Properties tbl) throws SerDeException {
@@ -69,33 +74,27 @@ public final class CSVSerde implements SerDe {
 
     this.inspector = ObjectInspectorFactory.getStandardStructObjectInspector(columnNames, columnOIs);
     this.outputFields = new String[numCols];
-    row = new ArrayList<String>(numCols);
+    this.row = new ArrayList<String>(numCols);
+    this.isBoolCol = new boolean[numCols];
+
+    int c = 0;
+    for (TypeInfo col : columnTypes) {
+      this.isBoolCol[c] = col.toString().equals("boolean");
+      c++;
+    }
 
     for (int i=0; i< numCols; i++) {
       row.add(null);
     }
 
-    separatorChar = getProperty(tbl, "separatorChar", CSVWriter.DEFAULT_SEPARATOR);
-    quoteChar = getProperty(tbl, "quoteChar", CSVWriter.DEFAULT_QUOTE_CHARACTER);
-    escapeChar = getProperty(tbl, "escapeChar", CSVWriter.DEFAULT_ESCAPE_CHARACTER);
+    this.separatorChar = getProperty(tbl, "separatorChar", CSVWriter.DEFAULT_SEPARATOR);
+    this.quoteChar = getProperty(tbl, "quoteChar", CSVWriter.DEFAULT_QUOTE_CHARACTER);
+    this.escapeChar = getProperty(tbl, "escapeChar", CSVWriter.DEFAULT_ESCAPE_CHARACTER);
 
-    encoding = tbl.getProperty("encoding", "UTF8");
+    this.encoding = tbl.getProperty("encoding", "US-ASCII");
 
-    String _normalize = tbl.getProperty("normalize", "false").toLowerCase();
-    if (_normalize != null && (_normalize.equals("true") ||
-          _normalize.equals("yes"))) {
-      normalize = true;
-    } else {
-      normalize = false;
-    }
-
-    String _stripQuote = tbl.getProperty("stripQuotes", "false").toLowerCase();
-    if (_stripQuote != null && (_stripQuote.equals("true") ||
-          _stripQuote.equals("yes"))) {
-      stripQuotes = true;
-    } else {
-      stripQuotes = false;
-    }
+    this.normalize = Boolean.parseBoolean(tbl.getProperty("normalize", "true"));
+    this.stripQuotes = Boolean.parseBoolean(tbl.getProperty("stripQuotes", "true"));
   }
 
   private final char getProperty(final Properties tbl, final String property, final char def) {
@@ -129,9 +128,23 @@ public final class CSVSerde implements SerDe {
       // Convert the field to Java class String, because objects of String type
       // can be stored in String, Text, or some other classes.
       outputFields[c] = fieldStringOI.getPrimitiveJavaObject(field);
+      if (outputFields[c] != null) {
+        if (isBoolCol[c]) {
+          outputFields[c] = outputFields[c].replaceAll("TRUE", "1");
+          outputFields[c] = outputFields[c].replaceAll("FALSE", "0");
+        }
 
-      if (stripQuotes) {
-        outputFields[c] = outputFields[c].replaceAll(String.valueOf(quoteChar), "");
+        if (normalize) {
+          outputFields[c] = Normalizer.normalize(outputFields[c], Form.NFKC);
+          outputFields[c] = outputFields[c].replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+          outputFields[c] = outputFields[c].replaceAll("\\p{C}", "");
+        }
+
+        if (stripQuotes) {
+          outputFields[c] = outputFields[c].replaceAll(String.valueOf(quoteChar), "");
+        }
+      } else {
+        outputFields[c] = "NULL";
       }
     }
 
@@ -142,14 +155,7 @@ public final class CSVSerde implements SerDe {
       csv.writeNext(outputFields);
       csv.close();
 
-      String csvs = writer.toString();
-      if (normalize) {
-        csvs = Normalizer.normalize(csvs, Form.NFKC);
-        csvs = csvs.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-        csvs = csvs.replaceAll("\\p{C}", "");
-      }
-
-      return new BytesWritable(csvs.getBytes(encoding));
+      return new BytesWritable(writer.toString().getBytes(encoding));
     } catch (final IOException ioe) {
       throw new SerDeException(ioe);
     }
