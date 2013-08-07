@@ -59,7 +59,9 @@ public class CSVSerde implements SerDe {
   boolean normalize;
   boolean stripQuotes;
 
-  @Override
+  private final static Logger LOGGER = Logger.getLogger(CSVSerde.class .getName());
+
+    @Override
   public void initialize(final Configuration conf, final Properties tbl) throws SerDeException {
     final List<String> columnNames = Arrays.asList(tbl.getProperty(Constants.LIST_COLUMNS).split(","));
     final List<TypeInfo> columnTypes = TypeInfoUtils.getTypeInfosFromTypeString(tbl.getProperty(Constants.LIST_COLUMN_TYPES));
@@ -91,7 +93,7 @@ public class CSVSerde implements SerDe {
     this.quoteChar = getProperty(tbl, "quoteChar", CSVWriter.DEFAULT_QUOTE_CHARACTER);
     this.escapeChar = getProperty(tbl, "escapeChar", CSVWriter.DEFAULT_ESCAPE_CHARACTER);
 
-    this.encoding = tbl.getProperty("encoding", "US-ASCII");
+    this.encoding = tbl.getProperty("encoding", "UTF-8");
 
     this.normalize = Boolean.parseBoolean(tbl.getProperty("normalize", "true"));
     this.stripQuotes = Boolean.parseBoolean(tbl.getProperty("stripQuotes", "true"));
