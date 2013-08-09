@@ -40,11 +40,11 @@ import au.com.bytecode.opencsv.CSVWriter;
 
 
 /**
- * CSVSerde uses opencsv (http://opencsv.sourceforge.net/) to serialize/deserialize columns as CSV.
+ * MySQLCSVSerde uses opencsv (http://opencsv.sourceforge.net/) to serialize/deserialize columns as CSV.
  *
  * @author Larry Ogrodnek <ogrodnek@gmail.com>
  */
-public class CSVSerde implements SerDe {
+public class MySQLCSVSerde implements SerDe {
 
   ObjectInspector inspector;
   String[] outputFields;
@@ -59,7 +59,7 @@ public class CSVSerde implements SerDe {
   boolean normalize;
   boolean stripQuotes;
 
-  private final static Logger LOGGER = Logger.getLogger(CSVSerde.class .getName());
+  private final static Logger LOGGER = Logger.getLogger(MySQLCSVSerde.class .getName());
 
     @Override
   public void initialize(final Configuration conf, final Properties tbl) throws SerDeException {
@@ -95,8 +95,8 @@ public class CSVSerde implements SerDe {
 
     this.encoding = tbl.getProperty("encoding", "UTF-8");
 
-    this.normalize = Boolean.parseBoolean(tbl.getProperty("normalize", "false"));
-    this.stripQuotes = Boolean.parseBoolean(tbl.getProperty("stripQuotes", "false"));
+    this.normalize = Boolean.parseBoolean(tbl.getProperty("normalize", "true"));
+    this.stripQuotes = Boolean.parseBoolean(tbl.getProperty("stripQuotes", "true"));
   }
 
   private final char getProperty(final Properties tbl, final String property, final char def) {
@@ -131,6 +131,11 @@ public class CSVSerde implements SerDe {
       // can be stored in String, Text, or some other classes.
       outputFields[c] = fieldStringOI.getPrimitiveJavaObject(field);
       if (outputFields[c] != null) {
+        if (isBoolCol[c]) {
+          outputFields[c] = outputFields[c].replaceAll("TRUE", "1");
+          outputFields[c] = outputFields[c].replaceAll("FALSE", "0");
+        }
+
         if (normalize) {
           outputFields[c] = Normalizer.normalize(outputFields[c], Form.NFKC);
           outputFields[c] = outputFields[c].replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
@@ -152,7 +157,7 @@ public class CSVSerde implements SerDe {
       csv.writeNext(outputFields);
       csv.close();
 
-      return new BytesWritable(writer.toString().getBytes(encoding));
+      return new BytesWritable(writer.toString().replaceAll("\"NULL\"", "NULL").getBytes(encoding));
     } catch (final IOException ioe) {
       throw new SerDeException(ioe);
     }
