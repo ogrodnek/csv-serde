@@ -49,6 +49,10 @@ The following include opencsv along with the serde, so only the single jar is ne
 
 Run `mvn package` to build.  Both a basic artifact as well as a "fat jar" (with opencsv) are produced.
 
+### Eclipse support
+
+Run `mvn eclipse:eclipse` to generate `.project` and `.classpath` files for eclipse.
+
 
 ## License
 
