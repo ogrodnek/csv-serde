@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+ 
+    <groupId>com.bizo</groupId>
+    <artifactId>csv-serde</artifactId>
+    <version>1.1.2-0.8.1</version>
+ 
+    <dependencies>
+      <dependency>
+      	<groupId>org.apache.hive</groupId>
+      	<artifactId>hive-exec</artifactId>
+      	<version>0.8.1</version>
+      </dependency>
+      <dependency>
+      	<groupId>org.apache.hadoop</groupId>
+      	<artifactId>hadoop-core</artifactId>
+      	<version>0.20.2</version>
+      </dependency>
+      <dependency>
+      	<groupId>net.sf.opencsv</groupId>
+      	<artifactId>opencsv</artifactId>
+      	<version>2.3</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.jdo</groupId>
+         <artifactId>jdo2-api</artifactId>
+         <version>2.3-20090302111651</version>
+      </dependency>                  
+    </dependencies>
+    
+    <properties>
+        <!-- use UTF-8 for everything -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/jar-with-dependencies.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>assemble-all</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>            
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-site-plugin</artifactId>
+              <version>3.0</version>
+              <configuration>
+                <reportPlugins>
+                  <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>2.5.1</version>
+                    <configuration>
+                      <formats>
+                        <format>html</format>
+                        <format>xml</format>
+                      </formats>
+                    </configuration>
+                  </plugin>
+                </reportPlugins>
+              </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
