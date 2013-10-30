@@ -1,10 +1,55 @@
 # Hive CSV Support
 
-        add jar path/to/csv-serde.jar;
+[![Build Status](https://drone.io/github.com/ogrodnek/csv-serde/status.png)](https://drone.io/github.com/ogrodnek/csv-serde/latest)
 
-        create table my_table(a string, b string, ...)
-          row format serde 'com.bizo.hive.serde.csv.CSVSerde'
-          stored as textfile
-        ;
+This SerDe adds *real* CSV input and ouput support to hive using the excellent [opencsv](http://opencsv.sourceforge.net/) library.
 
-see: http://dev.bizo.com/2010/11/csv-and-hive.html
+## Using
+
+
+### Basic Use
+
+```
+add jar path/to/csv-serde.jar;
+
+create table my_table(a string, b string, ...)
+  row format serde 'com.bizo.hive.serde.csv.CSVSerde'
+  stored as textfile
+;
+```
+
+### Custom formatting
+
+You can also specify custom separator, quote, or escape characters.
+
+```
+add jar path/to/csv-serde.jar;
+
+create table my_table(a string, b string, ...)
+ row format serde 'com.bizo.hive.serde.csv.CSVSerde'
+ with serdeproperties (
+   "separatorChar" = "\t",
+   "quoteChar"     = "'",
+   "escapeChar"    = "\\"
+  )	  
+ stored as textfile
+;
+```
+
+## Files
+
+The following include opencsv along with the serde, so only the single jar is needed.  Different builds are needed depending on your version of Hive.
+
+### Hive 0.8.*
+
+* [csv-serde-1.1.2-0.8.1-all.jar](https://drone.io/github.com/ogrodnek/csv-serde/files/target/csv-serde-1.1.2-0.8.1-all.jar)
+
+
+## Building
+
+Run `mvn package` to build.  Both a basic artifact as well as a "fat jar" (with opencsv) are produced.
+
+
+## License
+
+csv-serde is open source and licensed under the [Apache 2 License](http://www.apache.org/licenses/LICENSE-2.0.html).
