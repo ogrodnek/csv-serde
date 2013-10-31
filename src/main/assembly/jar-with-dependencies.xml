@@ -12,10 +12,6 @@
       <useProjectArtifact>true</useProjectArtifact>
       <unpack>true</unpack>
       <scope>runtime</scope>
-      <includes>
-        <include>net.sf.opencsv:opencsv</include>
-        <include>com.bizo:csv-serde</include>
-      </includes>
     </dependencySet>
   </dependencySets>
 </assembly>
