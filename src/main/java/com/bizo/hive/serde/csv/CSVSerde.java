@@ -26,6 +26,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
+import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 
@@ -45,7 +46,7 @@ public final class CSVSerde implements SerDe {
   private char separatorChar;
   private char quoteChar;
   private char escapeChar;
-  
+  private CSVParser csvParser;
     
   @Override
   public void initialize(final Configuration conf, final Properties tbl) throws SerDeException {
@@ -71,6 +72,11 @@ public final class CSVSerde implements SerDe {
     separatorChar = getProperty(tbl, "separatorChar", CSVWriter.DEFAULT_SEPARATOR);
     quoteChar = getProperty(tbl, "quoteChar", CSVWriter.DEFAULT_QUOTE_CHARACTER);
     escapeChar = getProperty(tbl, "escapeChar", CSVWriter.DEFAULT_ESCAPE_CHARACTER);
+    if (CSVWriter.DEFAULT_ESCAPE_CHARACTER == escapeChar) {
+      this.csvParser = new CSVParser(separatorChar, quoteChar);
+    } else {
+      this.csvParser = new CSVParser(separatorChar, quoteChar, escapeChar);
+    }
   }
   
   private final char getProperty(final Properties tbl, final String property, final char def) {
@@ -122,15 +128,13 @@ public final class CSVSerde implements SerDe {
   @Override
   public Object deserialize(final Writable blob) throws SerDeException {
     Text rowText = (Text) blob;
-    
-    CSVReader csv = null;
+
     try {
-      csv = newReader(new CharArrayReader(rowText.toString().toCharArray()), separatorChar, quoteChar, escapeChar);      
-      final String[] read = csv.readNext();
+      final String[] strings = this.csvParser.parseLine(rowText.toString());
       
-      for (int i=0; i< numCols; i++) {
-        if (read != null && i < read.length) {
-          row.set(i, read[i]);
+      for (int i=0; i < numCols; i++) {
+        if (strings != null && i < strings.length) {
+          row.set(i, strings[i]);
         } else {
           row.set(i, null);
         }
@@ -139,14 +143,6 @@ public final class CSVSerde implements SerDe {
       return row;
     } catch (final Exception e) {
       throw new SerDeException(e);
-    } finally {
-      if (csv != null) {
-        try {
-          csv.close();
-        } catch (final Exception e) {
-          // ignore
-        }
-      }
     }
   }
   
