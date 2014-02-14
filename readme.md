@@ -20,6 +20,14 @@ create table my_table(a string, b string, ...)
 
 ### Custom formatting
 
+The default separator, quote, and escape characters from the `opencsv` library are:
+
+```
+DEFAULT_ESCAPE_CHARACTER \
+DEFAULT_QUOTE_CHARACTER  "
+DEFAULT_SEPARATOR        ,
+```
+
 You can also specify custom separator, quote, or escape characters.
 
 ```
