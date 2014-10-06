@@ -133,33 +133,58 @@ public final class CSVSerde implements SerDe {
         if (columnTypes.get(i).getCategory() == ObjectInspector.Category.PRIMITIVE) {
           PrimitiveTypeInfo columnType = (PrimitiveTypeInfo) columnTypes.get(i);
           if (read != null && i < read.length) {
+            String val = read[i].trim();
             switch (columnType.getPrimitiveCategory()) {
               case BOOLEAN:
-                row.set(i, Boolean.valueOf(read[i]));
+                if (val.length() == 0)
+                  row.set(i, null);
+                else
+                  row.set(i, Boolean.valueOf(val));
                 break;
               case BYTE:
-                row.set(i, Byte.valueOf(read[i]));
+                if (val.length() == 0)
+                  row.set(i, null);
+                else
+                  row.set(i, Byte.valueOf(val));
                 break;
               case DOUBLE:
-                row.set(i, Double.valueOf(read[i]));
+                if (val.length() == 0)
+                  row.set(i, 0);
+                else
+                  row.set(i, Double.valueOf(val));
                 break;
               case FLOAT:
-                row.set(i, Float.valueOf(read[i]));
+                if (val.length() == 0)
+                  row.set(i, 0);
+                else
+                  row.set(i, Float.valueOf(val));
                 break;
               case INT:
-                row.set(i, Integer.valueOf(read[i]));
+                if (val.length() == 0)
+                  row.set(i, 0);
+                else
+                  row.set(i, Integer.valueOf(val));
                 break;
               case LONG:
-                row.set(i, Long.valueOf(read[i]));
+                if (val.length() == 0)
+                  row.set(i, 0);
+                else
+                  row.set(i, Long.valueOf(val));
                 break;
               case SHORT:
-                row.set(i, Short.valueOf(read[i]));
+                if (val.length() == 0)
+                  row.set(i, 0);
+                else
+                  row.set(i, Short.valueOf(val));
                 break;
               case TIMESTAMP:
-                row.set(i, java.sql.Timestamp.valueOf(read[i]));
+                if (val.length() == 0)
+                  row.set(i, null);
+                else
+                  row.set(i, java.sql.Timestamp.valueOf(val));
                 break;
               case STRING:
-                row.set(i, read[i]);
+                row.set(i, val);
                 break;
               case VOID:
                 row.set(i, null);
