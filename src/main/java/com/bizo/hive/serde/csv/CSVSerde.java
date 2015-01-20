@@ -151,8 +151,6 @@ public final class CSVSerde extends AbstractSerDe {
   }
   
   private CSVReader newReader(final Reader reader, char separator, char quote, char escape) {
-    // CSVReader will throw an exception if any of separator, quote, or escape is the same, but 
-    // the CSV format specifies that the escape character and quote char are the same... very weird
     if (CSVWriter.DEFAULT_ESCAPE_CHARACTER == escape) {
       return new CSVReader(reader, separator, quote);
     } else {

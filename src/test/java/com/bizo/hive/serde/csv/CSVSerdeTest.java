@@ -12,19 +12,19 @@ import static org.junit.Assert.assertEquals;
 
 public final class CSVSerdeTest {
   private final CSVSerde csv = new CSVSerde();
-  final Properties props = new Properties();  
-  
+  final Properties props = new Properties();
+
   @Before
   public void setup() throws Exception {
     props.put(serdeConstants.LIST_COLUMNS, "a,b,c,d");
     props.put(serdeConstants.LIST_COLUMN_TYPES, "string,string,string,string");
   }
-  
+
   @Test
   public void testDeserialize() throws Exception {
-    csv.initialize(null, props);    
+    csv.initialize(null, props);
+
     final Text in = new Text("hello,\"yes, okay\",1,\"new\nline\"");
-    
     final List<String> row = (List<String>) csv.deserialize(in);
 
     assertEquals("hello", row.get(0));
@@ -32,37 +32,53 @@ public final class CSVSerdeTest {
     assertEquals("1", row.get(2));
     assertEquals("new\nline", row.get(3));
   }
-  
-  
+
   @Test
-  public void testDeserializeCustomSeparators() throws Exception {
+  public void testDeserializeCustomSeparator() throws Exception {
     props.put("separatorChar", "\t");
     props.put("quoteChar", "'");
-    
+
     csv.initialize(null, props);
-    
+
     final Text in = new Text("hello\t'yes\tokay'\t1\t'new\nline'");
     final List<String> row = (List<String>) csv.deserialize(in);
-        
+
     assertEquals("hello", row.get(0));
-    assertEquals("yes\tokay", row.get(1));    
+    assertEquals("yes\tokay", row.get(1));
     assertEquals("1", row.get(2));
     assertEquals("new\nline", row.get(3));
   }
-  
+
   @Test
   public void testDeserializeCustomEscape() throws Exception {
     props.put("quoteChar", "'");
     props.put("escapeChar", "\\");
-    
+
     csv.initialize(null, props);
-    
+
     final Text in = new Text("hello,'yes\\'okay',1,\'new\nline\'");
     final List<String> row = (List<String>) csv.deserialize(in);
-        
+
     assertEquals("hello", row.get(0));
     assertEquals("yes'okay", row.get(1));
     assertEquals("1", row.get(2));
     assertEquals("new\nline", row.get(3));
-  }  
+  }
+
+  @Test
+  public void testDeserializeCustomSeparatorCustomEscape() throws Exception {
+    props.put("seperatorChar", ",");
+    props.put("quoteChar", "\"");
+    props.put("escapeChar", "\"");
+
+    csv.initialize(null, props);
+
+    final Text in = new Text("hello,\"yes, okay\",1,\"new\n\"\"line\"\"\"");
+    final List<String> row = (List<String>) csv.deserialize(in);
+
+    assertEquals("hello", row.get(0));
+    assertEquals("yes, okay", row.get(1));
+    assertEquals("1", row.get(2));
+    assertEquals("new\n\"line\"", row.get(3));
+  }
 }
