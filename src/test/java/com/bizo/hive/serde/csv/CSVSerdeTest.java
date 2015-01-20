@@ -23,7 +23,7 @@ public final class CSVSerdeTest {
   @Test
   public void testDeserialize() throws Exception {
     csv.initialize(null, props);    
-    final Text in = new Text("hello,\"yes, okay\",1,new\nline");
+    final Text in = new Text("hello,\"yes, okay\",1,\"new\nline\"");
     
     final List<String> row = (List<String>) csv.deserialize(in);
 
@@ -41,7 +41,7 @@ public final class CSVSerdeTest {
     
     csv.initialize(null, props);
     
-    final Text in = new Text("hello\t'yes\tokay'\t1\tnew\nline");
+    final Text in = new Text("hello\t'yes\tokay'\t1\t'new\nline'");
     final List<String> row = (List<String>) csv.deserialize(in);
         
     assertEquals("hello", row.get(0));
@@ -57,7 +57,7 @@ public final class CSVSerdeTest {
     
     csv.initialize(null, props);
     
-    final Text in = new Text("hello,'yes\\'okay',1,new\nline");
+    final Text in = new Text("hello,'yes\\'okay',1,\'new\nline\'");
     final List<String> row = (List<String>) csv.deserialize(in);
         
     assertEquals("hello", row.get(0));
