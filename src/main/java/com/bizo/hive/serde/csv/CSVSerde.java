@@ -36,58 +36,58 @@ import com.opencsv.CSVWriter;
  * @author Larry Ogrodnek <ogrodnek@gmail.com>
  */
 public final class CSVSerde extends AbstractSerDe {
-  
+
   private ObjectInspector inspector;
   private String[] outputFields;
   private int numCols;
   private List<String> row;
-  
+
   private char separatorChar;
   private char quoteChar;
   private char escapeChar;
-  
-    
+
+
   @Override
   public void initialize(final Configuration conf, final Properties tbl) throws SerDeException {
     final List<String> columnNames = Arrays.asList(tbl.getProperty(serdeConstants.LIST_COLUMNS).split(","));
     final List<TypeInfo> columnTypes = TypeInfoUtils.getTypeInfosFromTypeString(tbl.getProperty(serdeConstants.LIST_COLUMN_TYPES));
-    
+
     numCols = columnNames.size();
-    
+
     final List<ObjectInspector> columnOIs = new ArrayList<ObjectInspector>(numCols);
-    
+
     for (int i=0; i< numCols; i++) {
       columnOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
     }
-    
+
     this.inspector = ObjectInspectorFactory.getStandardStructObjectInspector(columnNames, columnOIs);
     this.outputFields = new String[numCols];
     row = new ArrayList<String>(numCols);
-    
+
     for (int i=0; i< numCols; i++) {
       row.add(null);
     }
-    
+
     separatorChar = getProperty(tbl, "separatorChar", CSVWriter.DEFAULT_SEPARATOR);
     quoteChar = getProperty(tbl, "quoteChar", CSVWriter.DEFAULT_QUOTE_CHARACTER);
     escapeChar = getProperty(tbl, "escapeChar", CSVWriter.DEFAULT_ESCAPE_CHARACTER);
   }
-  
+
   private final char getProperty(final Properties tbl, final String property, final char def) {
     final String val = tbl.getProperty(property);
-    
+
     if (val != null) {
       return val.charAt(0);
     }
-    
+
     return def;
   }
-  
+
   @Override
   public Writable serialize(Object obj, ObjectInspector objInspector) throws SerDeException {
     final StructObjectInspector outputRowOI = (StructObjectInspector) objInspector;
     final List<? extends StructField> outputFieldRefs = outputRowOI.getAllStructFieldRefs();
-    
+
     if (outputFieldRefs.size() != numCols) {
       throw new SerDeException("Cannot serialize the object because there are "
           + outputFieldRefs.size() + " fields but the table has " + numCols + " columns.");
@@ -97,22 +97,22 @@ public final class CSVSerde extends AbstractSerDe {
     for (int c = 0; c < numCols; c++) {
       final Object field = outputRowOI.getStructFieldData(obj, outputFieldRefs.get(c));
       final ObjectInspector fieldOI = outputFieldRefs.get(c).getFieldObjectInspector();
-      
+
       // The data must be of type String
       final StringObjectInspector fieldStringOI = (StringObjectInspector) fieldOI;
-      
+
       // Convert the field to Java class String, because objects of String type
       // can be stored in String, Text, or some other classes.
       outputFields[c] = fieldStringOI.getPrimitiveJavaObject(field);
     }
-    
+
     final StringWriter writer = new StringWriter();
     final CSVWriter csv = newWriter(writer, separatorChar, quoteChar, escapeChar);
-    
+
     try {
       csv.writeNext(outputFields);
       csv.close();
-      
+
       return new Text(writer.toString());
     } catch (final IOException ioe) {
       throw new SerDeException(ioe);
@@ -122,12 +122,12 @@ public final class CSVSerde extends AbstractSerDe {
   @Override
   public Object deserialize(final Writable blob) throws SerDeException {
     Text rowText = (Text) blob;
-    
+
     CSVReader csv = null;
     try {
       csv = newReader(new CharArrayReader(rowText.toString().toCharArray()), separatorChar, quoteChar, escapeChar);      
       final String[] read = csv.readNext();
-      
+
       for (int i=0; i< numCols; i++) {
         if (read != null && i < read.length) {
           row.set(i, read[i]);
@@ -135,7 +135,7 @@ public final class CSVSerde extends AbstractSerDe {
           row.set(i, null);
         }
       }
-      
+
       return row;
     } catch (final Exception e) {
       throw new SerDeException(e);
@@ -149,7 +149,7 @@ public final class CSVSerde extends AbstractSerDe {
       }
     }
   }
-  
+
   private CSVReader newReader(final Reader reader, char separator, char quote, char escape) {
     if (CSVWriter.DEFAULT_ESCAPE_CHARACTER == escape) {
       return new CSVReader(reader, separator, quote);
@@ -157,7 +157,7 @@ public final class CSVSerde extends AbstractSerDe {
       return new CSVReader(reader, separator, quote, escape);      
     }
   }
-  
+
   private CSVWriter newWriter(final Writer writer, char separator, char quote, char escape) {
     if (CSVWriter.DEFAULT_ESCAPE_CHARACTER == escape) {
       return new CSVWriter(writer, separator, quote, "");
@@ -175,7 +175,7 @@ public final class CSVSerde extends AbstractSerDe {
   public Class<? extends Writable> getSerializedClass() {
     return Text.class;
   }
-  
+
   public SerDeStats getSerDeStats() {
     return null;
   }
