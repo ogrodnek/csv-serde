@@ -30,7 +30,7 @@ public final class CSVSerdeTest {
     assertEquals("hello", row.get(0));
     assertEquals("yes, okay", row.get(1));
     assertEquals("1", row.get(2));
-    assertEquals("new\nline", row.get(3));
+    assertEquals("new<LF>line", row.get(3));
   }
 
   @Test
@@ -40,13 +40,13 @@ public final class CSVSerdeTest {
 
     csv.initialize(null, props);
 
-    final Text in = new Text("hello\t'yes\tokay'\t1\t'new\nline'");
+    final Text in = new Text("hello\t'yes\tokay'\t1\t'new\n\nline'");
     final List<String> row = (List<String>) csv.deserialize(in);
 
     assertEquals("hello", row.get(0));
     assertEquals("yes\tokay", row.get(1));
     assertEquals("1", row.get(2));
-    assertEquals("new\nline", row.get(3));
+    assertEquals("new<LF><LF>line", row.get(3));
   }
 
   @Test
@@ -56,13 +56,19 @@ public final class CSVSerdeTest {
 
     csv.initialize(null, props);
 
-    final Text in = new Text("hello,'yes\\'okay',1,\'new\nline\'");
+    final Text in = new Text("hello,'yes\\'okay',1,'new\r\nline'");
     final List<String> row = (List<String>) csv.deserialize(in);
 
     assertEquals("hello", row.get(0));
     assertEquals("yes'okay", row.get(1));
     assertEquals("1", row.get(2));
-    assertEquals("new\nline", row.get(3));
+// A bug in opencsv is causing carriage returns to be stripped. 
+// When this bug is resolved, the assertion below will be replaced
+// with the commented-out version below it. 
+// CSVSerde code will not need changed.
+// See https://sourceforge.net/p/opencsv/bugs/106.
+    assertEquals("new<LF>line", row.get(3));
+//    assertEquals("new<CRLF>line", row.get(3));
   }
 
   @Test
@@ -73,12 +79,18 @@ public final class CSVSerdeTest {
 
     csv.initialize(null, props);
 
-    final Text in = new Text("hello,\"yes, okay\",1,\"new\n\"\"line\"\"\"");
+    final Text in = new Text("hello,\"yes, okay\",1,\"new\r\n\r\n\"\"line\"\"\"");
     final List<String> row = (List<String>) csv.deserialize(in);
 
     assertEquals("hello", row.get(0));
     assertEquals("yes, okay", row.get(1));
     assertEquals("1", row.get(2));
-    assertEquals("new\n\"line\"", row.get(3));
+// A bug in opencsv is causing carriage returns to be stripped. 
+// When this bug is resolved, the assertion below will be replaced
+// with the commented-out version below it.
+// CSVSerde code will not need changed.
+// See https://sourceforge.net/p/opencsv/bugs/106.
+    assertEquals("new<LF><LF>\"line\"", row.get(3));
+//    assertEquals("new<CRLF><CRLF>\"line\"", row.get(3));
   }
 }

@@ -130,7 +130,7 @@ public final class CSVSerde extends AbstractSerDe {
 
       for (int i=0; i< numCols; i++) {
         if (read != null && i < read.length) {
-          row.set(i, read[i]);
+          row.set(i, read[i].toString().replace("\r\n", "<CRLF>").replace("\r", "<CR>").replace("\n","<LF>"));
         } else {
           row.set(i, null);
         }
