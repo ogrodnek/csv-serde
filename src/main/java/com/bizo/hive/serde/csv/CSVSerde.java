@@ -26,6 +26,7 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
+import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
@@ -45,7 +46,7 @@ public final class CSVSerde extends AbstractSerDe {
   private char separatorChar;
   private char quoteChar;
   private char escapeChar;
-
+  private CSVParser csvParser;
 
   @Override
   public void initialize(final Configuration conf, final Properties tbl) throws SerDeException {
@@ -71,6 +72,12 @@ public final class CSVSerde extends AbstractSerDe {
     separatorChar = getProperty(tbl, "separatorChar", CSVWriter.DEFAULT_SEPARATOR);
     quoteChar = getProperty(tbl, "quoteChar", CSVWriter.DEFAULT_QUOTE_CHARACTER);
     escapeChar = getProperty(tbl, "escapeChar", CSVWriter.DEFAULT_ESCAPE_CHARACTER);
+
+    if (CSVWriter.DEFAULT_ESCAPE_CHARACTER == escapeChar) {
+      this.csvParser = new CSVParser(separatorChar, quoteChar);
+    } else {
+      this.csvParser = new CSVParser(separatorChar, quoteChar, escapeChar);
+    }
   }
 
   private final char getProperty(final Properties tbl, final String property, final char def) {
@@ -123,14 +130,13 @@ public final class CSVSerde extends AbstractSerDe {
   public Object deserialize(final Writable blob) throws SerDeException {
     Text rowText = (Text) blob;
 
-    CSVReader csv = null;
     try {
-      csv = newReader(new CharArrayReader(rowText.toString().toCharArray()), separatorChar, quoteChar, escapeChar);      
-      final String[] read = csv.readNext();
+      final String[] strings = this.csvParser.parseLine(rowText.toString());
 
       for (int i=0; i< numCols; i++) {
-        if (read != null && i < read.length) {
-          row.set(i, read[i].replace("\r\n", "<CRLF>").replace("\r", "<CR>").replace("\n","<LF>"));
+        if (strings != null && i < strings.length) {
+          row.set(i, strings[i].replace("\r\n", "<CRLF>")
+              .replace("\r", "<CR>").replace("\n","<LF>"));
         } else {
           row.set(i, null);
         }
@@ -139,22 +145,6 @@ public final class CSVSerde extends AbstractSerDe {
       return row;
     } catch (final Exception e) {
       throw new SerDeException(e);
-    } finally {
-      if (csv != null) {
-        try {
-          csv.close();
-        } catch (final Exception e) {
-          // ignore
-        }
-      }
-    }
-  }
-
-  private CSVReader newReader(final Reader reader, char separator, char quote, char escape) {
-    if (CSVWriter.DEFAULT_ESCAPE_CHARACTER == escape) {
-      return new CSVReader(reader, separator, quote);
-    } else {
-      return new CSVReader(reader, separator, quote, escape);      
     }
   }
 

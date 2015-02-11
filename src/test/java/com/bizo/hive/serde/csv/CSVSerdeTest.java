@@ -62,13 +62,7 @@ public final class CSVSerdeTest {
     assertEquals("hello", row.get(0));
     assertEquals("yes'okay", row.get(1));
     assertEquals("1", row.get(2));
-// A bug in opencsv is causing carriage returns to be stripped. 
-// When this bug is resolved, the assertion below will be replaced
-// with the commented-out version below it. 
-// CSVSerde code will not need changed.
-// See https://sourceforge.net/p/opencsv/bugs/106.
-    assertEquals("new<LF>line", row.get(3));
-//    assertEquals("new<CRLF>line", row.get(3));
+    assertEquals("new<CRLF>line", row.get(3));
   }
 
   @Test
@@ -85,12 +79,6 @@ public final class CSVSerdeTest {
     assertEquals("hello", row.get(0));
     assertEquals("yes, okay", row.get(1));
     assertEquals("1", row.get(2));
-// A bug in opencsv is causing carriage returns to be stripped. 
-// When this bug is resolved, the assertion below will be replaced
-// with the commented-out version below it.
-// CSVSerde code will not need changed.
-// See https://sourceforge.net/p/opencsv/bugs/106.
-    assertEquals("new<LF><LF>\"line\"", row.get(3));
-//    assertEquals("new<CRLF><CRLF>\"line\"", row.get(3));
+    assertEquals("new<CRLF><CRLF>\"line\"", row.get(3));
   }
 }
