@@ -1,8 +1,6 @@
 package com.bizo.hive.serde.csv;
 
-import java.io.CharArrayReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -27,12 +25,12 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
 import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
 
 /**
- * CSVSerde uses opencsv (http://opencsv.sourceforge.net/) to serialize/deserialize columns as CSV.
+ * CSVSerde uses <a href="http://opencsv.sourceforge.net">opencsv</a>
+ * to serialize/deserialize columns as CSV.
  * 
  * @author Larry Ogrodnek <ogrodnek@gmail.com>
  */
@@ -41,7 +39,7 @@ public final class CSVSerde extends AbstractSerDe {
   private ObjectInspector inspector;
   private String[] outputFields;
   private int numCols;
-  private List<String> row;
+  private ArrayList<String> row;
 
   private char separatorChar;
   private char quoteChar;
@@ -49,9 +47,12 @@ public final class CSVSerde extends AbstractSerDe {
   private CSVParser csvParser;
 
   @Override
-  public void initialize(final Configuration conf, final Properties tbl) throws SerDeException {
-    final List<String> columnNames = Arrays.asList(tbl.getProperty(serdeConstants.LIST_COLUMNS).split(","));
-    final List<TypeInfo> columnTypes = TypeInfoUtils.getTypeInfosFromTypeString(tbl.getProperty(serdeConstants.LIST_COLUMN_TYPES));
+  public void
+      initialize(final Configuration conf, final Properties tbl) throws SerDeException {
+    final List<String> columnNames =
+        Arrays.asList(tbl.getProperty(serdeConstants.LIST_COLUMNS).split(","));
+    final List<TypeInfo> columnTypes = TypeInfoUtils
+        .getTypeInfosFromTypeString(tbl.getProperty(serdeConstants.LIST_COLUMN_TYPES));
 
     numCols = columnNames.size();
 
@@ -61,13 +62,10 @@ public final class CSVSerde extends AbstractSerDe {
       columnOIs.add(PrimitiveObjectInspectorFactory.javaStringObjectInspector);
     }
 
-    this.inspector = ObjectInspectorFactory.getStandardStructObjectInspector(columnNames, columnOIs);
+    this.inspector =
+        ObjectInspectorFactory.getStandardStructObjectInspector(columnNames, columnOIs);
     this.outputFields = new String[numCols];
-    row = new ArrayList<String>(numCols);
-
-    for (int i=0; i< numCols; i++) {
-      row.add(null);
-    }
+    row = new ArrayList<String>();
 
     separatorChar = getProperty(tbl, "separatorChar", CSVWriter.DEFAULT_SEPARATOR);
     quoteChar = getProperty(tbl, "quoteChar", CSVWriter.DEFAULT_QUOTE_CHARACTER);
@@ -80,7 +78,8 @@ public final class CSVSerde extends AbstractSerDe {
     }
   }
 
-  private final char getProperty(final Properties tbl, final String property, final char def) {
+  private final char
+      getProperty(final Properties tbl, final String property, final char def) {
     final String val = tbl.getProperty(property);
 
     if (val != null) {
@@ -91,9 +90,11 @@ public final class CSVSerde extends AbstractSerDe {
   }
 
   @Override
-  public Writable serialize(Object obj, ObjectInspector objInspector) throws SerDeException {
+  public Writable serialize(Object obj, ObjectInspector objInspector)
+      throws SerDeException {
     final StructObjectInspector outputRowOI = (StructObjectInspector) objInspector;
-    final List<? extends StructField> outputFieldRefs = outputRowOI.getAllStructFieldRefs();
+    final List<? extends StructField> outputFieldRefs =
+        outputRowOI.getAllStructFieldRefs();
 
     if (outputFieldRefs.size() != numCols) {
       throw new SerDeException("Cannot serialize the object because there are "
@@ -133,22 +134,23 @@ public final class CSVSerde extends AbstractSerDe {
     try {
       final String[] strings = this.csvParser.parseLine(rowText.toString());
 
-      for (int i=0; i< numCols; i++) {
-        if (strings != null && i < strings.length) {
-          row.set(i, strings[i].replace("\r\n", "<CRLF>")
+      for (String thisRow : strings) {
+        if (strings != null) {
+          row.add(thisRow.replace("\r\n", "<CRLF>")
               .replace("\r", "<CR>").replace("\n","<LF>"));
         } else {
-          row.set(i, null);
+          row.add(null);
         }
       }
 
       return row;
-    } catch (final Exception e) {
+    } catch (final IOException e) {
       throw new SerDeException(e);
     }
   }
 
-  private CSVWriter newWriter(final Writer writer, char separator, char quote, char escape) {
+  private CSVWriter
+      newWriter(final Writer writer, char separator, char quote, char escape) {
     if (CSVWriter.DEFAULT_ESCAPE_CHARACTER == escape) {
       return new CSVWriter(writer, separator, quote, "");
     } else {
