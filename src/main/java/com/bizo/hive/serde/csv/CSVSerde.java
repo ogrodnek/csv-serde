@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.serde.Constants;
-import org.apache.hadoop.hive.serde2.SerDe;
+import org.apache.hadoop.hive.serde.serdeConstants;
+import org.apache.hadoop.hive.serde2.AbstractSerDe;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.SerDeStats;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
@@ -21,8 +21,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
-import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 
@@ -35,7 +33,7 @@ import au.com.bytecode.opencsv.CSVWriter;
  * 
  * @author Larry Ogrodnek <ogrodnek@gmail.com>
  */
-public final class CSVSerde implements SerDe {
+public final class CSVSerde extends AbstractSerDe {
   
   private ObjectInspector inspector;
   private String[] outputFields;
@@ -49,8 +47,7 @@ public final class CSVSerde implements SerDe {
     
   @Override
   public void initialize(final Configuration conf, final Properties tbl) throws SerDeException {
-    final List<String> columnNames = Arrays.asList(tbl.getProperty(Constants.LIST_COLUMNS).split(","));
-    final List<TypeInfo> columnTypes = TypeInfoUtils.getTypeInfosFromTypeString(tbl.getProperty(Constants.LIST_COLUMN_TYPES));
+    final List<String> columnNames = Arrays.asList(tbl.getProperty(serdeConstants.LIST_COLUMNS).split(","));
     
     numCols = columnNames.size();
     
@@ -178,7 +175,8 @@ public final class CSVSerde implements SerDe {
     return Text.class;
   }
   
-  public SerDeStats getSerDeStats() {
+  @Override
+public SerDeStats getSerDeStats() {
     return null;
   }
 }
