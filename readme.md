@@ -1,6 +1,10 @@
 # Hive CSV Support
 
-[![Build Status](https://drone.io/github.com/ogrodnek/csv-serde/status.png)](https://drone.io/github.com/ogrodnek/csv-serde/latest)
+This work was contributed to the apache hive project and is maintained there, [see details here](https://cwiki.apache.org/confluence/display/Hive/CSV+Serde).
+
+
+-----
+
 
 This SerDe adds *real* CSV input and ouput support to hive using the excellent [opencsv](http://opencsv.sourceforge.net/) library.
 
