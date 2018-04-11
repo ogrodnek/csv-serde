@@ -48,7 +48,7 @@ create table my_table(a string, b string, ...)
 
 The following include opencsv along with the serde, so only the single jar is needed.  Currently built against Hive 0.11.0, but should be compatible with other hive versions.
 
-* [csv-serde-1.1.2-0.11.0-all.jar](https://drone.io/github.com/ogrodnek/csv-serde/files/target/csv-serde-1.1.2-0.11.0-all.jar)
+* [csv-serde-1.1.3-1.2.1-all.jar](https://drone.io/github.com/ogrodnek/csv-serde/files/target/csv-serde-1.1.3-1.2.1-all.jar)
 
 
 ## Building
